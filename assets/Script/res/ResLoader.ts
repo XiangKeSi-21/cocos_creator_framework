@@ -194,7 +194,13 @@ export class ResLoader {
         if (res) {
             finishCallback(null, res);
         } else {
-            cc.loader.loadRes(resArgs.url, resArgs.type, resArgs.onProgess, finishCallback);
+            let ccloader: any = cc.loader;
+            let uuid = ccloader._getResUuid(resArgs.url, resArgs.type, false);
+            if( uuid ) {
+                cc.loader.loadRes(resArgs.url, resArgs.type, resArgs.onProgess, finishCallback);
+            } else {
+                cc.loader.load(resArgs.url, resArgs.onProgess, finishCallback);
+            }
         }
     }
 
@@ -222,7 +228,10 @@ export class ResLoader {
         if (resArgs.use) {
             cacheInfo.uses.delete(resArgs.use)
         }
-        this._release(item, item.id);
+
+        if (cacheInfo.uses.size == 0) {
+            this._release(item, item.id);
+        }
     }
 
     // 释放一个资源
